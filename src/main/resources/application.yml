@@ -16,6 +16,9 @@ spring:
         default_schema: public
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
         format_sql: true
+  kafka:
+    bootstrap-servers: 192.168.10.111:29092
+    group-id: group-id-fluent-bit
 
   redis:
     host: 192.168.10.111
@@ -27,3 +30,7 @@ slack:
 
 search:
   algorithm : KnuthMorrisPratt
+
+message:
+  topic:
+    name: test

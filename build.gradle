@@ -39,6 +39,15 @@ dependencies {
 	// postgresql
 	implementation 'org.postgresql:postgresql'
 
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	// jackson
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// slack
 	implementation("com.slack.api:bolt:1.18.0")
 	implementation("com.slack.api:bolt-servlet:1.18.0")
