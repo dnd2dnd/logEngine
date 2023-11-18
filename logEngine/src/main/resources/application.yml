@@ -18,7 +18,7 @@ spring:
         format_sql: true
   kafka:
     bootstrap-servers: 192.168.10.111:29092
-    group-id: group-id-fluent-bit
+    group-id: group-id-fluent-bit # ???? ???? ??? ? ?? ?
 
   redis:
     host: 192.168.10.111
@@ -31,7 +31,7 @@ slack:
   channel: log
 
 search:
-  algorithm: KnuthMorrisPratt
+  algorithm : KnuthMorrisPratt
 
 message:
   topic:

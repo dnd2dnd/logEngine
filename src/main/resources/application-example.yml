@@ -1,0 +1,35 @@
+server:
+  port: { SERVER_PORT }
+
+spring:
+  datasource:
+    url: { JDBC_URL }
+    driver-class-name: { JDBC_DRIVER }
+    username: { JDBC_USERNAME }
+    password: { JDBC_PASSWORD }
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: { JPA_DIALECT }
+  kafka:
+    bootstrap-servers: 192.168.10.111:29092
+    group-id: group-id-fluent-bit
+
+  redis:
+    host: { REDIS_HOST }
+    port: { REDIS_PORT }
+  cache:
+    type: redis
+
+slack:
+  token: { SLACK_TOKEN }
+  channel: { SLACK_CHANNEL }
+
+search:
+  algorithm: KnuthMorrisPratt
+
+message:
+  topic:
+    name: { KAFKA_TOPIC_NAME }

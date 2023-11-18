@@ -2,12 +2,14 @@ package com.example.logengine.utils.search;
 
 import javax.validation.constraints.NotNull;
 
+import com.example.logengine.utils.search.SearchString;
+
 public class KnuthMorrisPratt implements SearchString {
 
 	@Override
 	public boolean find(@NotNull String text, @NotNull String pattern) {
 		int pos = 0;
-		pos = kmpSearch(text.toCharArray(), pattern.toCharArray());
+		pos = kmpSearch(text.toCharArray(), pattern.toCharArray()) ;
 		if (pos < 0) {
 			return false;
 		} else {
@@ -19,14 +21,15 @@ public class KnuthMorrisPratt implements SearchString {
 	 * KMP 알고리즘
 	 * @param pattern   검색하고자 하는 pattern
 	 * @param text      검색대상이 되는 text
-	 * @return 찾으면 0 보다 큰 값을 리턴
+	 * @return          찾으면 0 보다 큰 값을 리턴
 	 */
 	public int kmpSearch(char[] text, char[] pattern) {
 		int patternSize = pattern.length;
 		int textSize = text.length;
 
 		int i = 0, j = 0;
-		int[] shift = knuthMorrisPrattShift(pattern);
+
+		int[] shift = KnuthMorrisPrattShift(pattern);
 
 		while ((i + patternSize) <= textSize) {
 			while (text[i + j] == pattern[j]) {
@@ -46,13 +49,14 @@ public class KnuthMorrisPratt implements SearchString {
 		return -1;
 	}
 
-	private int[] knuthMorrisPrattShift(char[] pattern) {
+	private int[] KnuthMorrisPrattShift(char[] pattern) {
 		int patternSize = pattern.length;
 
 		int[] shift = new int[patternSize];
 		shift[0] = 1;
 
 		int i = 1, j = 0;
+
 		while ((i + j) < patternSize) {
 			if (pattern[i + j] == pattern[j]) {
 				shift[i + j] = i;

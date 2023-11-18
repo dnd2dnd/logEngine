@@ -19,6 +19,10 @@ public class SearchService {
 	}
 
 	public boolean find(String text, String pattern) {
-		return this.searchString.find(text, pattern);
+		if (!this.searchString.find(text, pattern)) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

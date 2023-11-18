@@ -27,21 +27,38 @@ import lombok.extern.slf4j.Slf4j;
 public class LogFilterService {
 	@Value("${search.algorithm}")
 	private String algorithm;
-	private final ObjectMapper mapper = new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
 
 	private final SearchService searchService;
 	private final SlackService slackService;
 	private final RedisCacheService redisCacheService;
 
+
 	public void doFindKafka(String message) throws JsonProcessingException {
 		CollectorDto collectorDto = mapper.readValue(message, CollectorDto.class);
 		String msg = collectorDto.getLog();
 		String filename = collectorDto.getProduct();
-		if (msg == null) {
+		if(msg == null) {
 			return;
 		}
 
-		if (filename != null && findStr(msg, filename)) {
+		// System.out.println(collectorDto);
+
+		if(filename!= null && findStr(msg, filename)) {
+			slackService.sendMessage(msg);
+		}
+	}
+
+	public void doFind(CollectorDto collectorDto) {
+		String msg = collectorDto.getLog();
+		String filename = collectorDto.getProduct();
+		if(msg == null) {
+			return;
+		}
+
+		System.out.println(msg);
+
+		if(filename!= null && findStr(msg, filename)) {
 			slackService.sendMessage(msg);
 		}
 	}
@@ -52,22 +69,22 @@ public class LogFilterService {
 		List<FilterInfo> list = redisCacheService.getFilterInfoCache(filename);
 		for (FilterInfo filterInfo : list) {
 			String s = filterInfo.getMsg();
-			List<String> findStr = stringSep(s);
+		    List<String> findStr = stringSep(s);
 
-			if (findStr.size() == 1) {
-				// 하나의 문자열만 찾으면 됨.
-				if (searchService.find(msg, s)) {
-					return true;
-				}
-			} else if (findStr.size() > 1) {
-				// 두개의 and 조건을 만족해야 함.
+		    if (findStr.size() == 1) {
+		        // 하나의 문자열만 찾으면 됨.
+		        if (searchService.find(msg, s)) {
+		            return true;
+		        }
+		    } else if (findStr.size() > 1){
+		        // 두개의 and 조건을 만족해야 함.
 				for (String fs : findStr) {
-					if (!searchService.find(msg, fs)) {
+					if(!searchService.find(msg, fs)) {
 						return false;
 					}
 				}
 				return true;
-			}
+		    }
 		}
 		return false;
 	}

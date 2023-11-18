@@ -1,5 +1,7 @@
 package com.example.logengine.dto;
 
+import java.sql.Timestamp;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -22,4 +24,15 @@ public class CollectorDto {
 	private String product;
 	private String filename;
 	private String log;
+
+	@Override
+	public String toString() {
+		return "CollectorDto{" +
+			"timestamp=" + timestamp +
+			", hostname='" + hostname + '\'' +
+			", product='" + product + '\'' +
+			", filename='" + filename + '\'' +
+			", log='" + log + '\'' +
+			'}';
+	}
 }

@@ -1,0 +1,58 @@
+version: '3'
+services:
+  flunet-bit:
+    container_name: fluent-bit
+    image: fluent/fluent-bit:1.9.9-debug
+    volumes:
+      - ./fluentbit/config:/fluent-bit/etc
+      - ./fluentbit/logs:/fluent-bit/log 
+
+  timescaledb:
+    container_name: timescale
+    image: timescale/timescaledb-ha:pg14-latest
+    user: "root"
+    environment:
+      POSTGRES_USER : "postgres"
+      POSTGRES_DB : "postgres"
+      POSTGRES_PASSWORD : "123"    
+      PGDATA: "/var/lib/postgres/data"
+      TZ: "Asia/Seoul" # 한국 시간대 설정
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./timescaledb/data:/var/lib/postgres/data  
+
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+    ports:
+      - "2181:2181"  
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://192.168.10.111:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0            
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    
