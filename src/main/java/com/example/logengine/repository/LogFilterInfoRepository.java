@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.logengine.entity.FilterInfo;
+import com.example.logengine.entity.LogFilterInfo;
 
 @Repository
-public interface FilterInfoRepository extends JpaRepository<FilterInfo, Integer> {
-	List<FilterInfo> findByFileName(String fileName);
+public interface LogFilterInfoRepository extends JpaRepository<LogFilterInfo, Integer> {
+	List<LogFilterInfo> findByFileName(String fileName);
 }

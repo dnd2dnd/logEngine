@@ -1,7 +1,5 @@
 package com.example.logengine.message.slack;
 
-import static com.example.logengine.message.slack.SlackConstant.*;
-
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class SlackService {
+	private final String PREFIX = "#";
 	@Value("${slack.token}")
 	public String slackToken;
 	@Value("${slack.channel}")
@@ -26,14 +25,13 @@ public class SlackService {
 		try {
 			MethodsClient methodsClient = Slack.getInstance().methods(slackToken);
 			ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-				.channel(LOG_CHANNEL)
+				.channel(PREFIX + slackChannel)
 				.text(message)
 				.build();
 			methodsClient.chatPostMessage(request);
-			log.info(slackChannel + "에 " + message + " 메세지 보냄");
+			log.info(PREFIX + slackChannel + "에 " + message + " 메세지 보냄");
 		} catch (IOException | SlackApiException e) {
-			throw new RuntimeException(e);
+			log.error(e.getMessage());
 		}
 	}
-
 }

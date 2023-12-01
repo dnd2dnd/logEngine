@@ -1,5 +1,6 @@
 package com.example.logengine.service;
 
+import static com.example.logengine.utils.CommonResponse.*;
 import static com.example.logengine.utils.search.SearchConstants.*;
 
 import java.util.Arrays;
@@ -8,11 +9,16 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.logengine.dto.CollectorDto;
-import com.example.logengine.entity.FilterInfo;
+import com.example.logengine.dto.LogFilterInfoDto;
+import com.example.logengine.entity.LogFilterInfo;
 import com.example.logengine.message.slack.SlackService;
+import com.example.logengine.repository.LogFilterInfoRepository;
+import com.example.logengine.utils.CommonResponse;
 import com.example.logengine.utils.search.RedisCacheService;
 import com.example.logengine.utils.search.SearchService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,10 +34,20 @@ public class LogFilterService {
 	@Value("${search.algorithm}")
 	private String algorithm;
 	private final ObjectMapper mapper = new ObjectMapper();
-
 	private final SearchService searchService;
 	private final SlackService slackService;
 	private final RedisCacheService redisCacheService;
+	private final LogDataService logDataService;
+	private final LogFilterInfoRepository logFilterInfoRepository;
+
+	public ResponseEntity<CommonResponse> addLogFilterInfo(LogFilterInfoDto request) {
+		LogFilterInfo logFilterInfo = LogFilterInfo.builder()
+			.fileName(request.getFilename())
+			.msg(request.getMsg())
+			.build();
+		logFilterInfoRepository.save(logFilterInfo);
+		return toCommonResponse("로그 필터 추가", HttpStatus.OK.value());
+	}
 
 	public void doFindKafka(String message) throws JsonProcessingException {
 		CollectorDto collectorDto = mapper.readValue(message, CollectorDto.class);
@@ -44,14 +60,14 @@ public class LogFilterService {
 		if (filename != null && findStr(msg, filename)) {
 			slackService.sendMessage(msg);
 		}
+		logDataService.saveLog(collectorDto);
 	}
 
 	public boolean findStr(String msg, String filename) {
 		searchService.setAlgorithm(algorithm);
-		System.out.println("시작 !!!");
-		List<FilterInfo> list = redisCacheService.getFilterInfoCache(filename);
-		for (FilterInfo filterInfo : list) {
-			String s = filterInfo.getMsg();
+		List<LogFilterInfo> list = redisCacheService.getFilterInfoCache(filename);
+		for (LogFilterInfo logFilterInfo : list) {
+			String s = logFilterInfo.getMsg();
 			List<String> findStr = stringSep(s);
 
 			if (findStr.size() == 1) {
