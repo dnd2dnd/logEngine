@@ -17,7 +17,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollectorDto {
 	@JsonProperty(value = "@timestamp")
-	private Long timestamp;
+	private String timestamp;
 	private String hostname;
 	private String product;
 	private String filename;

@@ -2,9 +2,11 @@ package com.example.logengine.utils.search;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import com.example.logengine.dto.LogFilterInfoDto;
 import com.example.logengine.entity.LogFilterInfo;
 import com.example.logengine.repository.LogFilterInfoRepository;
 
@@ -22,4 +24,12 @@ public class RedisCacheService {
 		return logFilterInfoRepository.findByFileName(filename);
 	}
 
+	@CacheEvict(cacheNames = "getFilterInfoCache", key = "#request.filename")
+	public void addLogFilterInfo(LogFilterInfoDto request) {
+		LogFilterInfo logFilterInfo = LogFilterInfo.builder()
+			.fileName(request.getFilename())
+			.msg(request.getMsg())
+			.build();
+		logFilterInfoRepository.save(logFilterInfo);
+	}
 }

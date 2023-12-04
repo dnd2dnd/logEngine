@@ -17,7 +17,6 @@ import com.example.logengine.dto.CollectorDto;
 import com.example.logengine.dto.LogFilterInfoDto;
 import com.example.logengine.entity.LogFilterInfo;
 import com.example.logengine.message.slack.SlackService;
-import com.example.logengine.repository.LogFilterInfoRepository;
 import com.example.logengine.utils.CommonResponse;
 import com.example.logengine.utils.search.RedisCacheService;
 import com.example.logengine.utils.search.SearchService;
@@ -38,14 +37,9 @@ public class LogFilterService {
 	private final SlackService slackService;
 	private final RedisCacheService redisCacheService;
 	private final LogDataService logDataService;
-	private final LogFilterInfoRepository logFilterInfoRepository;
 
 	public ResponseEntity<CommonResponse> addLogFilterInfo(LogFilterInfoDto request) {
-		LogFilterInfo logFilterInfo = LogFilterInfo.builder()
-			.fileName(request.getFilename())
-			.msg(request.getMsg())
-			.build();
-		logFilterInfoRepository.save(logFilterInfo);
+		redisCacheService.addLogFilterInfo(request);
 		return toCommonResponse("로그 필터 추가", HttpStatus.OK.value());
 	}
 
@@ -66,6 +60,7 @@ public class LogFilterService {
 	public boolean findStr(String msg, String filename) {
 		searchService.setAlgorithm(algorithm);
 		List<LogFilterInfo> list = redisCacheService.getFilterInfoCache(filename);
+
 		for (LogFilterInfo logFilterInfo : list) {
 			String s = logFilterInfo.getMsg();
 			List<String> findStr = stringSep(s);
