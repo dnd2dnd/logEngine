@@ -60,7 +60,6 @@ public class LogFilterService {
 	public boolean findStr(String msg, String filename) {
 		searchService.setAlgorithm(algorithm);
 		List<LogFilterInfo> list = redisCacheService.getFilterInfoCache(filename);
-
 		for (LogFilterInfo logFilterInfo : list) {
 			String s = logFilterInfo.getMsg();
 			List<String> findStr = stringSep(s);
@@ -72,12 +71,16 @@ public class LogFilterService {
 				}
 			} else if (findStr.size() > 1) {
 				// 두개의 and 조건을 만족해야 함.
+				int cnt = 0;
 				for (String fs : findStr) {
 					if (!searchService.find(msg, fs)) {
-						return false;
+						break;
 					}
+					cnt++;
 				}
-				return true;
+				if (cnt == findStr.size()) {
+					return true;
+				}
 			}
 		}
 		return false;
